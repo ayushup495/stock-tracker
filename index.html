@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>StockTrack</title>
+<meta name="theme-color" content="#2C4A6E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StockTrack">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #EDEAE2;
+  --paper-card: #F7F5F0;
+  --ink: #211E1A;
+  --ink-soft: #5C584F;
+  --steel: #B8B4A7;
+  --stamp-blue: #2C4A6E;
+  --stamp-blue-dark: #1E3450;
+  --signal-green: #3D6B35;
+  --signal-green-bg: #E3EADC;
+  --signal-red: #A83A22;
+  --signal-red-bg: #F2DFD5;
+  --signal-amber: #A67C27;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-head: 'IBM Plex Sans Condensed', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+body[data-theme="dark"] {
+  --paper: #1C1A17;
+  --paper-card: #262320;
+  --ink: #ECE8E0;
+  --ink-soft: #A8A296;
+  --steel: #4A463F;
+  --signal-green-bg: #24331F;
+  --signal-red-bg: #3A241C;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.15s, color 0.15s;
+}
+.screen { min-height: 100vh; }
+#loginView { display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; }
+.login-card {
+  background: var(--paper-card);
+  border: 1px solid var(--steel);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+.login-card h1 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 24px;
+  margin: 0 0 20px;
+  text-transform: uppercase;
+}
+.subtitle { color: var(--ink-soft); font-size: 13px; margin: 0 0 18px; }
+.login-card label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 12px 0 6px; text-align: left; }
+.login-card input, .login-card select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+.login-card input:focus { outline: none; border-color: var(--stamp-blue); }
+.auth-tabs { display: flex; border: 1px solid var(--steel); margin-bottom: 18px; }
+.auth-tab { flex: 1; background: transparent; border: none; padding: 10px; font-size: 11px; color: var(--ink-soft); }
+.auth-tab.active { background: var(--stamp-blue); color: #F7F5F0; }
+.username-row { display: flex; gap: 6px; align-items: stretch; }
+.username-row input { flex: 1; }
+.username-row button { white-space: nowrap; padding: 0 12px; font-size: 11px; }
+#pinInput { display: none; }
+button {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 11px 18px;
+  border-radius: 2px;
+}
+button:active { transform: translateY(1px); }
+.primary-btn { background: var(--stamp-blue); border-color: var(--stamp-blue); color: #F7F5F0; width: 100%; margin-top: 16px; }
+.primary-btn:hover { background: var(--stamp-blue-dark); }
+.secondary-btn { border-color: var(--signal-red); color: var(--signal-red); }
+.ghost-btn { border-color: var(--steel); color: var(--ink-soft); }
+.theme-toggle-corner { position: absolute; top: 16px; right: 16px; padding: 6px 10px; font-size: 11px; }
+.topbar {
+  background: var(--stamp-blue);
+  color: #F7F5F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.topbar h1 { font-family: var(--font-head); font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+.user-badge { font-size: 12px; opacity: 0.8; font-family: var(--font-mono); }
+.topbar .ghost-btn { border-color: rgba(247,245,240,0.4); color: #F7F5F0; padding: 7px 11px; font-size: 11px; }
+.conn-badge { font-family: var(--font-mono); font-size: 10px; padding: 3px 7px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,255,255,0.14); }
+.conn-badge.online { color: #BFE0B4; }
+.conn-badge.offline { color: #F0B8A8; }
+.topbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs { display: flex; border-bottom: 1px solid var(--steel); background: var(--paper-card); overflow-x: auto; }
+.tab-btn { flex: 1; border: none; border-bottom: 3px solid transparent; background: transparent; padding: 14px 8px; color: var(--ink-soft); white-space: nowrap; }
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--stamp-blue); }
+main { padding: 16px; max-width: 640px; margin: 0 auto; }
+.action-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.action-row button { flex: 1; min-width: 110px; }
+.items-list, .history-list { display: flex; flex-direction: column; gap: 1px; }
+.item-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--paper-card); border-left: 4px solid var(--signal-green); padding: 12px 16px;
+}
+.item-row.low-stock { border-left-color: var(--signal-red); }
+.item-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.item-thumb { width: 42px; height: 42px; object-fit: cover; border: 1px solid var(--steel); border-radius: 2px; flex-shrink: 0; }
+.item-thumb-placeholder { width: 42px; height: 42px; border: 1px dashed var(--steel); border-radius: 2px; flex-shrink: 0; }
+.item-name { font-weight: 500; font-size: 15px; }
+.model-tag { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-weight: 400; }
+.item-category { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.item-stock { text-align: right; flex-shrink: 0; }
+.stock-value { font-family: var(--font-mono); font-size: 16px; font-weight: 500; }
+.stock-status { font-family: var(--font-head); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--signal-green); margin-top: 2px; }
+.item-row.low-stock .stock-status { color: var(--signal-red); }
+.history-row { display: flex; align-items: center; gap: 12px; background: var(--paper-card); padding: 12px 16px; border-left: 4px solid var(--steel); }
+.history-row.pending { border-left-color: var(--signal-amber); }
+.history-type { font-family: var(--font-mono); font-size: 11px; font-weight: 500; padding: 3px 7px; letter-spacing: 0.05em; white-space: nowrap; }
+.type-in { background: var(--signal-green-bg); color: var(--signal-green); }
+.type-out { background: var(--signal-red-bg); color: var(--signal-red); }
+.history-details { flex: 1; min-width: 0; }
+.history-item-name { font-size: 14px; font-weight: 500; }
+.pending-tag { font-size: 10px; color: var(--signal-amber); margin-left: 6px; font-family: var(--font-mono); text-transform: uppercase; }
+.history-meta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.history-qty { font-family: var(--font-mono); font-size: 14px; white-space: nowrap; }
+select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 1px solid var(--steel); background: var(--paper-card); font-family: var(--font-body); color: var(--ink); }
+.empty-state { color: var(--ink-soft); font-size: 14px; text-align: center; padding: 32px 16px; }
+.offline-note { font-size: 12px; color: var(--signal-amber); background: #FBF1DD; border: 1px solid #E6CE8F; padding: 8px 12px; margin-bottom: 12px; display: none; }
+.offline-note.show { display: block; }
+.insight-box { background: var(--paper-card); border: 1px solid var(--steel); padding: 14px 16px; margin-bottom: 16px; }
+.insight-box h3 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; margin: 0 0 12px; color: var(--ink-soft); }
+.bar-row { display: grid; grid-template-columns: 96px 1fr 64px; align-items: center; gap: 8px; padding: 5px 0; }
+.bar-label { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { background: var(--paper); border: 0.5px solid var(--steel); height: 14px; border-radius: 2px; overflow: hidden; }
+.bar-fill { background: var(--stamp-blue); height: 100%; }
+.bar-value { font-family: var(--font-mono); font-size: 11px; text-align: right; }
+.qty-stepper { display: flex; align-items: stretch; gap: 6px; }
+.qty-stepper input { text-align: center; }
+.stepper-btn { padding: 0 16px; font-size: 18px; line-height: 1; }
+.settings-box { background: var(--paper-card); border: 1px solid var(--steel); padding: 14px 16px; margin-bottom: 16px; }
+.settings-box h3 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; margin: 0 0 10px; color: var(--ink-soft); }
+.settings-box input { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; margin-bottom: 8px; }
+.photo-preview { max-width: 110px; max-height: 110px; margin-top: 8px; border: 1px solid var(--steel); display: none; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(33,30,26,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10; }
+.modal { background: var(--paper-card); border: 1px solid var(--steel); padding: 28px 24px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.06em; font-size: 18px; margin: 0 0 4px; }
+.modal label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 14px 0 6px; }
+.modal input, .modal select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--stamp-blue); }
+.modal-actions { display: flex; gap: 8px; margin-top: 24px; }
+.modal-actions button { flex: 1; }
+.error-text { color: var(--signal-red); font-size: 13px; margin: 10px 0 0; min-height: 16px; }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="screen">
+  <button class="ghost-btn theme-toggle-corner" onclick="toggleTheme()" id="themeToggleBtnLogin">Dark</button>
+  <div class="login-card">
+    <h1>StockTrack</h1>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTabBtn" onclick="switchAuthMode('login')">Log in</button>
+      <button class="auth-tab" id="signupTabBtn" onclick="switchAuthMode('signup')">Create new shop</button>
+    </div>
+
+    <div id="loginForm">
+      <p class="subtitle">Enter your shop username and password</p>
+      <label>Username</label>
+      <input type="text" id="loginUsername" autocomplete="username">
+      <label>Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password">
+      <button class="primary-btn" onclick="handleLogin()">Log in</button>
+      <p id="loginError" class="error-text"></p>
+    </div>
+
+    <div id="signupForm" style="display:none;">
+      <p class="subtitle">Sets up a brand new, separate shop</p>
+      <label>Shop name</label>
+      <input type="text" id="signupShopName" placeholder="e.g. ABCD Traders">
+      <label>Your name</label>
+      <input type="text" id="signupOwnerName" placeholder="e.g. Ramesh">
+      <label>Choose a username</label>
+      <div class="username-row">
+        <input type="text" id="signupUsername" autocomplete="username">
+        <button type="button" class="ghost-btn" onclick="checkUsernameAvailability()">Check</button>
+      </div>
+      <p id="usernameCheckStatus" class="error-text"></p>
+      <label>Password (at least 6 characters)</label>
+      <input type="password" id="signupPassword" autocomplete="new-password">
+      <button class="primary-btn" onclick="submitSignup()">Create shop</button>
+      <p id="signupError" class="error-text"></p>
+    </div>
+  </div>
+</div>
+
+<div id="appView" class="screen" style="display:none;">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>StockTrack</h1>
+      <span id="userName" class="user-badge"></span>
+      <span id="connBadge" class="conn-badge">···</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="ghost-btn" onclick="toggleTheme()" id="themeToggleBtn">Dark</button>
+      <button class="ghost-btn" onclick="openModal('changePinModal')">Password</button>
+      <button class="ghost-btn" onclick="handleLogout()">Log out</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" data-tab="history" onclick="switchTab('history')">History</button>
+    <button class="tab-btn" data-tab="items" onclick="switchTab('items')">Items</button>
+    <button class="tab-btn" id="usersTabBtn" data-tab="users" onclick="switchTab('users')" style="display:none;">Team</button>
+  </nav>
+
+  <main>
+    <section id="dashboardTab" class="tab-content">
+      <p id="offlineNote" class="offline-note">You're offline — showing the last saved data. New entries will be saved and synced once you're back online.</p>
+      <div class="insight-box">
+        <h3>Most used this week</h3>
+        <div id="topUsedChart"></div>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" id="stockInBtn" onclick="openModal('stockInModal')" style="display:none; margin-top:0;">+ Stock in</button>
+        <button class="secondary-btn" id="stockOutBtn" onclick="openModal('stockOutModal')" style="display:none;">− Stock out</button>
+        <button class="ghost-btn" onclick="exportExcel()">Export excel</button>
+      </div>
+      <div id="itemsList" class="items-list"></div>
+    </section>
+
+    <section id="historyTab" class="tab-content" style="display:none;">
+      <select id="historyFilter" onchange="renderHistory()">
+        <option value="">All items</option>
+      </select>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section id="itemsTab" class="tab-content" style="display:none;">
+      <div class="action-row">
+        <button class="primary-btn" id="addItemBtn" onclick="openModal('addItemModal')" style="display:none; margin-top:0;">+ Add item</button>
+      </div>
+      <div id="itemsManageList" class="items-list"></div>
+    </section>
+
+    <section id="usersTab" class="tab-content" style="display:none;">
+      <div class="settings-box">
+        <h3>Weekly report email</h3>
+        <input type="email" id="reportEmailInput" placeholder="owner@example.com">
+        <button class="primary-btn" onclick="saveReportEmail()" style="margin-top:0;">Save email</button>
+        <p id="reportEmailStatus" class="error-text"></p>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" onclick="openModal('addUserModal')" style="margin-top:0;">+ Add person</button>
+      </div>
+      <div id="usersManageList" class="items-list"></div>
+    </section>
+  </main>
+</div>
+
+<div id="stockInModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('stockInModal')">
+  <div class="modal">
+    <h2>Stock in</h2>
+    <label>Item</label>
+    <select id="stockInItem"></select>
+    <label>Quantity</label>
+    <div class="qty-stepper">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockInQty',-1)">−</button>
+      <input type="number" id="stockInQty" min="0" step="any">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockInQty',1)">+</button>
+    </div>
+    <label>Source / supplier</label>
+    <input type="text" id="stockInSource" placeholder="e.g. ABC Traders">
+    <label>Date</label>
+    <input type="date" id="stockInDate">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('stockInModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitStockIn()">Save</button>
+    </div>
+    <p id="stockInError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="stockOutModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('stockOutModal')">
+  <div class="modal">
+    <h2>Stock out</h2>
+    <label>Item</label>
+    <select id="stockOutItem"></select>
+    <label>Quantity</label>
+    <div class="qty-stepper">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockOutQty',-1)">−</button>
+      <input type="number" id="stockOutQty" min="0" step="any">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockOutQty',1)">+</button>
+    </div>
+    <label>Used for / issued to</label>
+    <input type="text" id="stockOutPurpose" placeholder="e.g. Production batch 12">
+    <label>Date</label>
+    <input type="date" id="stockOutDate">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('stockOutModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitStockOut()">Save</button>
+    </div>
+    <p id="stockOutError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="addItemModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('addItemModal')">
+  <div class="modal">
+    <h2>Add item</h2>
+    <label>Item name</label>
+    <input type="text" id="newItemName" placeholder="e.g. Steel sheets">
+    <label>Model number (optional)</label>
+    <input type="text" id="newItemModel" placeholder="e.g. XJ-2000">
+    <label>Unit</label>
+    <select id="newItemUnit">
+      <option value="kg">kg</option>
+      <option value="litre">litre</option>
+      <option value="pieces">pieces</option>
+      <option value="box">box</option>
+      <option value="bag">bag</option>
+      <option value="ton">ton</option>
+    </select>
+    <label>Category</label>
+    <input type="text" id="newItemCategory" placeholder="e.g. Raw material">
+    <label>Opening stock (what's already in the shop today)</label>
+    <input type="number" id="newItemOpening" min="0" step="any" value="0">
+    <label>Reorder level (alert when stock falls below this)</label>
+    <input type="number" id="newItemReorder" min="0" step="any" value="0">
+    <label>Photo (optional, helps find it on the shelf)</label>
+    <input type="file" accept="image/*" id="newItemPhotoFile" onchange="previewItemPhoto(event)">
+    <img id="newItemPhotoPreview" class="photo-preview">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('addItemModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitNewItem()">Save</button>
+    </div>
+    <p id="addItemError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="addUserModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('addUserModal')">
+  <div class="modal">
+    <h2>Add person</h2>
+    <label>Name</label>
+    <input type="text" id="newMemberName" placeholder="e.g. Ramesh">
+    <label>Username</label>
+    <input type="text" id="newMemberUsername" placeholder="e.g. ramesh1">
+    <label>Password (at least 6 characters — a 6-digit number works fine)</label>
+    <input type="text" id="newMemberPassword" placeholder="e.g. 583920">
+    <label>Role</label>
+    <select id="newMemberRole">
+      <option value="viewer">Viewer — can only see stock</option>
+      <option value="admin">Admin — can add and edit everything</option>
+    </select>
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitNewMember()">Save</button>
+    </div>
+    <p id="addMemberError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="changePinModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('changePinModal')">
+  <div class="modal">
+    <h2>Change my password</h2>
+    <label>New password (at least 6 characters)</label>
+    <input type="text" id="newPasswordValue" placeholder="e.g. 583920">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('changePinModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitChangePassword()">Save</button>
+    </div>
+    <p id="changePinError" class="error-text"></p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBRDzHMYrc__PkzE0pK3Jpxxwy5t31suJE",
+  authDomain: "inventory-managment-f0176.firebaseapp.com",
+  databaseURL: "https://inventory-managment-f0176-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "inventory-managment-f0176",
+  storageBucket: "inventory-managment-f0176.firebasestorage.app",
+  messagingSenderId: "436868904074",
+  appId: "1:436868904074:web:4bba8ffb374236c17ba973",
+};
+firebase.initializeApp(firebaseConfig);
+const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
+const auth = firebase.auth();
+const secondaryAuth = secondaryApp.auth();
+const db = firebase.database();
+const EMAIL_SUFFIX = '@stocktrack.local';
+
+let currentUser = null; // { uid, shopId, shopName, username, name, role }
+let items = {}, transactions = {}, shopMembers = {}, pendingQueue = [];
+let isConnected = false, pendingPhotoData = null;
+let lastCheckedUsername = null, usernameAvailable = false;
+
+/* ---------- theme ---------- */
+(function initTheme() {
+  let saved = 'light';
+  try { saved = localStorage.getItem('st_theme') || 'light'; } catch (e) {}
+  if (saved === 'dark') document.body.setAttribute('data-theme', 'dark');
+})();
+function toggleTheme() {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  if (next === 'dark') document.body.setAttribute('data-theme', 'dark');
+  else document.body.removeAttribute('data-theme');
+  const label = next === 'dark' ? 'Light' : 'Dark';
+  ['themeToggleBtn', 'themeToggleBtnLogin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = label;
+  });
+  try { localStorage.setItem('st_theme', next); } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const isDark = document.body.getAttribute('data-theme') === 'dark';
+  const label = isDark ? 'Light' : 'Dark';
+  ['themeToggleBtn', 'themeToggleBtnLogin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = label;
+  });
+});
+
+/* ---------- auth mode switch (login vs signup) ---------- */
+function switchAuthMode(mode) {
+  document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('loginTabBtn').classList.toggle('active', mode === 'login');
+  document.getElementById('signupTabBtn').classList.toggle('active', mode === 'signup');
+}
+
+/* ---------- session persistence: Firebase Auth handles this natively ---------- */
+let signupInProgress = false;
+auth.onAuthStateChanged(function (user) {
+  if (signupInProgress) return; // signup writes its own records first, then enters the app itself
+  if (user) {
+    loadMembershipAndEnter(user.uid);
+  } else {
+    currentUser = null;
+    document.getElementById('appView').style.display = 'none';
+    document.getElementById('loginView').style.display = 'flex';
+  }
+});
+
+function loadMembershipAndEnter(uid) {
+  db.ref('userShop/' + uid).once('value').then(function (snap) {
+    const shopId = snap.val();
+    if (!shopId) {
+      document.getElementById('loginError').textContent = 'Account exists but is not linked to a shop yet.';
+      auth.signOut();
+      return;
+    }
+    return db.ref('shopMembers/' + shopId + '/' + uid).once('value').then(function (mSnap) {
+      const m = mSnap.val() || {};
+      return db.ref('shops/' + shopId + '/name').once('value').then(function (nSnap) {
+        currentUser = { uid: uid, shopId: shopId, shopName: nSnap.val() || '', username: m.username || '', name: m.name || '', role: m.role || 'viewer' };
+        enterApp();
+      });
+    });
+  }).catch(function (err) {
+    const errEl = document.getElementById('loginError');
+    if (errEl) errEl.textContent = 'Could not load your shop (' + err.message + '). Check your connection and try again.';
+  });
+}
+
+function enterApp() {
+  document.getElementById('userName').textContent = currentUser.name + ' · ' + currentUser.shopName + ' · ' + (currentUser.role === 'admin' ? 'admin' : 'viewer');
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('appView').style.display = 'block';
+  applyRoleVisibility();
+  loadData();
+}
+
+/* ---------- login ---------- */
+function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  if (!username || !password) { errEl.textContent = 'Enter username and password'; return; }
+  errEl.textContent = 'Logging in…';
+  const timeoutId = setTimeout(function () {
+    errEl.textContent = 'Taking too long — check your internet connection and try again';
+  }, 12000);
+  auth.signInWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function () {
+    clearTimeout(timeoutId);
+  }).catch(function (err) {
+    clearTimeout(timeoutId);
+    errEl.textContent = (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') ? 'Incorrect username or password' : err.message;
+  });
+}
+
+/* ---------- signup (creates a brand new, separate shop) ---------- */
+function checkUsernameAvailability() {
+  const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+  const statusEl = document.getElementById('usernameCheckStatus');
+  if (!username) { statusEl.textContent = 'Enter a username first'; statusEl.style.color = ''; return; }
+  statusEl.textContent = 'Checking…'; statusEl.style.color = '';
+  db.ref('usernames/' + username).once('value').then(function (snap) {
+    lastCheckedUsername = username;
+    usernameAvailable = !snap.exists();
+    statusEl.textContent = usernameAvailable ? 'Available' : 'Not available — try another';
+    statusEl.style.color = usernameAvailable ? 'var(--signal-green)' : 'var(--signal-red)';
+  }).catch(function () {
+    statusEl.textContent = 'Could not check right now — try again';
+  });
+}
+
+function submitSignup() {
+  const shopName = document.getElementById('signupShopName').value.trim();
+  const ownerName = document.getElementById('signupOwnerName').value.trim();
+  const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const errEl = document.getElementById('signupError');
+  if (!shopName || !ownerName || !username || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password needs at least 6 characters'; return; }
+  if (lastCheckedUsername !== username || !usernameAvailable) { errEl.textContent = 'Please check username availability first'; return; }
+  errEl.textContent = 'Creating your shop…';
+  signupInProgress = true;
+  auth.createUserWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function (cred) {
+    const uid = cred.user.uid;
+    const shopId = db.ref('shops').push().key;
+    return db.ref('usernames/' + username).set(uid)
+      .then(function () { return db.ref('shops/' + shopId).set({ name: shopName, ownerUid: uid, createdAt: Date.now() }); })
+      .then(function () { return db.ref('shopMembers/' + shopId + '/' + uid).set({ username: username, name: ownerName, role: 'admin', createdAt: Date.now() }); })
+      .then(function () { return db.ref('userShop/' + uid).set(shopId); })
+      .then(function () {
+        signupInProgress = false;
+        errEl.textContent = '';
+        currentUser = { uid: uid, shopId: shopId, shopName: shopName, username: username, name: ownerName, role: 'admin' };
+        enterApp();
+      });
+  }).catch(function (err) {
+    signupInProgress = false;
+    errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That username is already taken' : err.message;
+  });
+}
+
+function handleLogout() {
+  if (currentUser) {
+    db.ref('shops/' + currentUser.shopId + '/items').off();
+    db.ref('shops/' + currentUser.shopId + '/transactions').off();
+    db.ref('shops/' + currentUser.shopId + '/settings').off();
+    db.ref('shopMembers/' + currentUser.shopId).off();
+  }
+  db.ref('.info/connected').off();
+  auth.signOut();
+}
+
+function applyRoleVisibility() {
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  document.getElementById('stockInBtn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('stockOutBtn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('addItemBtn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('usersTabBtn').style.display = isAdmin ? '' : 'none';
+}
+
+/* ---------- local cache, scoped per shop (works even with no internet) ---------- */
+function cacheKey(name) { return 'st_' + name + '_' + (currentUser ? currentUser.shopId : 'x'); }
+function saveCache() {
+  try {
+    localStorage.setItem(cacheKey('items'), JSON.stringify(items));
+    localStorage.setItem(cacheKey('transactions'), JSON.stringify(transactions));
+  } catch (e) {}
+}
+function loadCache() {
+  try { items = JSON.parse(localStorage.getItem(cacheKey('items')) || '{}'); } catch (e) { items = {}; }
+  try { transactions = JSON.parse(localStorage.getItem(cacheKey('transactions')) || '{}'); } catch (e) { transactions = {}; }
+}
+function loadPendingQueue() {
+  try { pendingQueue = JSON.parse(localStorage.getItem(cacheKey('pending')) || '[]'); } catch (e) { pendingQueue = []; }
+}
+function savePendingQueue() {
+  try { localStorage.setItem(cacheKey('pending'), JSON.stringify(pendingQueue)); } catch (e) {}
+}
+function mergePendingIntoTransactions() {
+  pendingQueue.forEach(p => { transactions[p.localId] = Object.assign({}, p.data, { pending: true }); });
+}
+
+/* ---------- data loading + offline sync (all scoped under the current shop) ---------- */
+function loadData() {
+  const shopId = currentUser.shopId;
+  loadPendingQueue();
+  loadCache();
+  mergePendingIntoTransactions();
+  renderDashboard(); renderItemsManage(); renderHistory(); populateItemDropdowns(); renderTopUsedChart();
+
+  db.ref('.info/connected').on('value', snap => {
+    isConnected = snap.val() === true;
+    updateConnBadge();
+    if (isConnected) flushPendingQueue();
+  });
+  db.ref('shops/' + shopId + '/items').on('value', snap => {
+    items = snap.val() || {};
+    saveCache();
+    renderDashboard(); renderItemsManage(); populateItemDropdowns(); renderTopUsedChart();
+  });
+  db.ref('shops/' + shopId + '/transactions').on('value', snap => {
+    transactions = snap.val() || {};
+    mergePendingIntoTransactions();
+    saveCache();
+    renderDashboard(); renderHistory(); renderItemsManage(); renderTopUsedChart();
+  });
+  db.ref('shopMembers/' + shopId).on('value', snap => {
+    shopMembers = snap.val() || {};
+    if (currentUser.role === 'admin') renderMembersManage();
+  });
+  db.ref('shops/' + shopId + '/settings').on('value', snap => {
+    const s = snap.val() || {};
+    const emailInput = document.getElementById('reportEmailInput');
+    if (emailInput && s.reportEmail && document.activeElement !== emailInput) emailInput.value = s.reportEmail;
+  });
+}
+
+function updateConnBadge() {
+  const badge = document.getElementById('connBadge');
+  const note = document.getElementById('offlineNote');
+  if (badge) {
+    badge.textContent = isConnected ? 'Online' : 'Offline';
+    badge.className = 'conn-badge ' + (isConnected ? 'online' : 'offline');
+  }
+  if (note) note.className = 'offline-note' + (isConnected ? '' : ' show');
+}
+
+function queueTransaction(data) {
+  const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  pendingQueue.push({ localId, data });
+  savePendingQueue();
+  transactions[localId] = Object.assign({}, data, { pending: true });
+  renderDashboard(); renderHistory(); renderItemsManage(); renderTopUsedChart();
+}
+
+function flushPendingQueue() {
+  if (!isConnected || pendingQueue.length === 0 || !currentUser) return;
+  const shopId = currentUser.shopId;
+  const queue = pendingQueue.slice();
+  queue.forEach(p => {
+    db.ref('shops/' + shopId + '/transactions').push(p.data).then(() => {
+      pendingQueue = pendingQueue.filter(x => x.localId !== p.localId);
+      savePendingQueue();
+      delete transactions[p.localId];
+      renderDashboard(); renderHistory(); renderItemsManage(); renderTopUsedChart();
+    }).catch(() => { /* stays queued, retried on next reconnect */ });
+  });
+}
+
+/* ---------- stock math ---------- */
+function getCurrentStock(itemId) {
+  const item = items[itemId];
+  if (!item) return 0;
+  let stock = Number(item.openingStock) || 0;
+  for (const key in transactions) {
+    const t = transactions[key];
+    if (t.itemId !== itemId) continue;
+    stock += t.type === 'in' ? Number(t.quantity) : -Number(t.quantity);
+  }
+  return stock;
+}
+function formatNumber(n) { return Number(n).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function getTopUsedThisWeek(limit) {
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const counts = {};
+  for (const key in transactions) {
+    const t = transactions[key];
+    if (t.type !== 'out') continue;
+    if ((t.createdAt || 0) < weekAgo) continue;
+    counts[t.itemId] = (counts[t.itemId] || 0) + Number(t.quantity);
+  }
+  return Object.keys(counts)
+    .map(id => ({ id, name: items[id] ? items[id].name : 'Deleted item', unit: items[id] ? items[id].unit : '', qty: counts[id] }))
+    .sort((a, b) => b.qty - a.qty)
+    .slice(0, limit || 5);
+}
+
+/* ---------- rendering ---------- */
+function renderTopUsedChart() {
+  const el = document.getElementById('topUsedChart');
+  if (!el) return;
+  const top = getTopUsedThisWeek(5);
+  if (top.length === 0) { el.innerHTML = '<p class="empty-state" style="padding:8px 0;">No stock-out entries yet this week.</p>'; return; }
+  const max = Math.max.apply(null, top.map(t => t.qty));
+  el.innerHTML = top.map(t => {
+    const pct = Math.max(6, Math.round((t.qty / max) * 100));
+    return `<div class="bar-row">
+      <div class="bar-label">${t.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-value">${formatNumber(t.qty)} ${t.unit}</div>
+    </div>`;
+  }).join('');
+}
+
+function itemThumbHtml(item) {
+  return item.photo ? `<img src="${item.photo}" class="item-thumb">` : `<div class="item-thumb-placeholder"></div>`;
+}
+
+function renderDashboard() {
+  const list = document.getElementById('itemsList');
+  const ids = Object.keys(items);
+  if (ids.length === 0) { list.innerHTML = '<p class="empty-state">No items yet. Add one from the Items tab.</p>'; return; }
+  list.innerHTML = ids.map(id => {
+    const item = items[id];
+    const stock = getCurrentStock(id);
+    const low = stock <= (Number(item.reorderLevel) || 0);
+    return `<div class="item-row${low ? ' low-stock' : ''}">
+      <div class="item-left">
+        ${itemThumbHtml(item)}
+        <div>
+          <div class="item-name">${item.name}${item.modelNumber ? ` <span class="model-tag">#${item.modelNumber}</span>` : ''}</div>
+          <div class="item-category">${item.category || ''}</div>
+        </div>
+      </div>
+      <div class="item-stock">
+        <div class="stock-value">${formatNumber(stock)} ${item.unit}</div>
+        <div class="stock-status">${low ? 'Low stock' : 'In stock'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderItemsManage() {
+  const list = document.getElementById('itemsManageList');
+  const ids = Object.keys(items);
+  if (ids.length === 0) { list.innerHTML = '<p class="empty-state">No items yet.</p>'; return; }
+  list.innerHTML = ids.map(id => {
+    const item = items[id];
+    const stock = getCurrentStock(id);
+    return `<div class="item-row">
+      <div class="item-left">
+        ${itemThumbHtml(item)}
+        <div>
+          <div class="item-name">${item.name}${item.modelNumber ? ` <span class="model-tag">#${item.modelNumber}</span>` : ''}</div>
+          <div class="item-category">${item.category || ''} · reorder below ${formatNumber(item.reorderLevel || 0)} ${item.unit}</div>
+        </div>
+      </div>
+      <div class="item-stock"><div class="stock-value">${formatNumber(stock)} ${item.unit}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMembersManage() {
+  const list = document.getElementById('usersManageList');
+  if (!list) return;
+  const ids = Object.keys(shopMembers);
+  if (ids.length === 0) { list.innerHTML = '<p class="empty-state">No team members yet.</p>'; return; }
+  list.innerHTML = ids.map(uid => {
+    const m = shopMembers[uid];
+    return `<div class="item-row">
+      <div>
+        <div class="item-name">${m.name} <span class="model-tag">@${m.username}</span></div>
+        <div class="item-category">${(m.role || 'viewer') === 'admin' ? 'Admin — can edit' : 'Viewer — can only see'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function populateItemDropdowns() {
+  const optsHtml = Object.keys(items).map(id => `<option value="${id}">${items[id].name}</option>`).join('');
+  document.getElementById('stockInItem').innerHTML = optsHtml;
+  document.getElementById('stockOutItem').innerHTML = optsHtml;
+  document.getElementById('historyFilter').innerHTML = '<option value="">All items</option>' + optsHtml;
+}
+
+function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function adjustQty(id, delta) {
+  const el = document.getElementById(id);
+  const val = (Number(el.value) || 0) + delta;
+  el.value = Math.max(0, Math.round(val * 100) / 100);
+}
+
+/* ---------- item photo (resized client-side, stored as small base64) ---------- */
+function previewItemPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) { pendingPhotoData = null; return; }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      const maxSize = 200;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; } }
+      else { if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; } }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      pendingPhotoData = canvas.toDataURL('image/jpeg', 0.7);
+      const preview = document.getElementById('newItemPhotoPreview');
+      preview.src = pendingPhotoData;
+      preview.style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- stock in / out (queues automatically when offline) ---------- */
+function submitStockIn() {
+  const itemId = document.getElementById('stockInItem').value;
+  const qty = Number(document.getElementById('stockInQty').value);
+  const source = document.getElementById('stockInSource').value.trim();
+  const date = document.getElementById('stockInDate').value || todayStr();
+  const errEl = document.getElementById('stockInError');
+  if (!itemId) { errEl.textContent = 'Add an item first, from the Items tab'; return; }
+  if (!qty || qty <= 0) { errEl.textContent = 'Enter a valid quantity'; return; }
+  const data = { itemId, type: 'in', quantity: qty, party: source, date, loggedBy: currentUser.name, createdAt: Date.now() };
+  const finish = () => {
+    errEl.textContent = '';
+    closeModal('stockInModal');
+    document.getElementById('stockInQty').value = '';
+    document.getElementById('stockInSource').value = '';
+  };
+  if (isConnected) { db.ref('shops/' + currentUser.shopId + '/transactions').push(data).then(finish); }
+  else { queueTransaction(data); finish(); }
+}
+
+function submitStockOut() {
+  const itemId = document.getElementById('stockOutItem').value;
+  const qty = Number(document.getElementById('stockOutQty').value);
+  const purpose = document.getElementById('stockOutPurpose').value.trim();
+  const date = document.getElementById('stockOutDate').value || todayStr();
+  const errEl = document.getElementById('stockOutError');
+  if (!itemId) { errEl.textContent = 'Add an item first, from the Items tab'; return; }
+  if (!qty || qty <= 0) { errEl.textContent = 'Enter a valid quantity'; return; }
+  const available = getCurrentStock(itemId);
+  if (qty > available) { errEl.textContent = `Only ${formatNumber(available)} available`; return; }
+  const data = { itemId, type: 'out', quantity: qty, party: purpose, date, loggedBy: currentUser.name, createdAt: Date.now() };
+  const finish = () => {
+    errEl.textContent = '';
+    closeModal('stockOutModal');
+    document.getElementById('stockOutQty').value = '';
+    document.getElementById('stockOutPurpose').value = '';
+  };
+  if (isConnected) { db.ref('shops/' + currentUser.shopId + '/transactions').push(data).then(finish); }
+  else { queueTransaction(data); finish(); }
+}
+
+function submitNewItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const modelNumber = document.getElementById('newItemModel').value.trim();
+  const unit = document.getElementById('newItemUnit').value;
+  const category = document.getElementById('newItemCategory').value.trim();
+  const opening = Number(document.getElementById('newItemOpening').value) || 0;
+  const reorder = Number(document.getElementById('newItemReorder').value) || 0;
+  const errEl = document.getElementById('addItemError');
+  if (!name) { errEl.textContent = 'Enter an item name'; return; }
+  if (!isConnected) { errEl.textContent = 'Needs internet to add a new item'; return; }
+  const payload = { name, unit, category, openingStock: opening, reorderLevel: reorder, createdAt: Date.now() };
+  if (modelNumber) payload.modelNumber = modelNumber;
+  if (pendingPhotoData) payload.photo = pendingPhotoData;
+  db.ref('shops/' + currentUser.shopId + '/items').push(payload).then(() => {
+    errEl.textContent = '';
+    closeModal('addItemModal');
+    document.getElementById('newItemName').value = '';
+    document.getElementById('newItemModel').value = '';
+    document.getElementById('newItemCategory').value = '';
+    document.getElementById('newItemOpening').value = '0';
+    document.getElementById('newItemReorder').value = '0';
+    document.getElementById('newItemPhotoFile').value = '';
+    document.getElementById('newItemPhotoPreview').style.display = 'none';
+    pendingPhotoData = null;
+  }).catch(err => { errEl.textContent = err.message; });
+}
+
+/* ---------- team members (owner creates a login for each person) ---------- */
+function submitNewMember() {
+  const name = document.getElementById('newMemberName').value.trim();
+  const username = document.getElementById('newMemberUsername').value.trim().toLowerCase();
+  const password = document.getElementById('newMemberPassword').value;
+  const role = document.getElementById('newMemberRole').value;
+  const errEl = document.getElementById('addMemberError');
+  if (!name || !username || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password needs at least 6 characters'; return; }
+  if (!isConnected) { errEl.textContent = 'Needs internet to add a person'; return; }
+  errEl.textContent = 'Checking username…';
+  db.ref('usernames/' + username).once('value').then(function (snap) {
+    if (snap.exists()) { errEl.textContent = 'That username is already taken'; return; }
+    errEl.textContent = 'Creating…';
+    const shopId = currentUser.shopId;
+    secondaryAuth.createUserWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function (cred) {
+      const newUid = cred.user.uid;
+      return db.ref('usernames/' + username).set(newUid)
+        .then(function () { return db.ref('shopMembers/' + shopId + '/' + newUid).set({ username: username, name: name, role: role, createdAt: Date.now() }); })
+        .then(function () { return db.ref('userShop/' + newUid).set(shopId); })
+        .then(function () { return secondaryAuth.signOut(); });
+    }).then(function () {
+      errEl.textContent = '';
+      closeModal('addUserModal');
+      document.getElementById('newMemberName').value = '';
+      document.getElementById('newMemberUsername').value = '';
+      document.getElementById('newMemberPassword').value = '';
+    }).catch(function (err) {
+      errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That username is already taken' : err.message;
+    });
+  });
+}
+
+function submitChangePassword() {
+  const newPassword = document.getElementById('newPasswordValue').value;
+  const errEl = document.getElementById('changePinError');
+  if (!newPassword || newPassword.length < 6) { errEl.textContent = 'Needs at least 6 characters'; return; }
+  const user = auth.currentUser;
+  if (!user) { errEl.textContent = 'Please log in again'; return; }
+  user.updatePassword(newPassword).then(function () {
+    errEl.textContent = '';
+    closeModal('changePinModal');
+    document.getElementById('newPasswordValue').value = '';
+  }).catch(function (err) {
+    errEl.textContent = err.code === 'auth/requires-recent-login' ? 'Please log out, log back in, then try again' : err.message;
+  });
+}
+
+function saveReportEmail() {
+  const email = document.getElementById('reportEmailInput').value.trim();
+  const statusEl = document.getElementById('reportEmailStatus');
+  if (!email) { statusEl.textContent = 'Enter an email'; statusEl.style.color = ''; return; }
+  if (!isConnected) { statusEl.textContent = 'Needs internet to save'; statusEl.style.color = ''; return; }
+  db.ref('shops/' + currentUser.shopId + '/settings/reportEmail').set(email).then(() => {
+    statusEl.textContent = 'Saved';
+    statusEl.style.color = 'var(--signal-green)';
+  }).catch(err => { statusEl.textContent = err.message; statusEl.style.color = ''; });
+}
+
+/* ---------- history ---------- */
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  const filterVal = document.getElementById('historyFilter').value;
+  const rows = Object.keys(transactions)
+    .map(key => Object.assign({ id: key }, transactions[key]))
+    .filter(t => !filterVal || t.itemId === filterVal)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  if (rows.length === 0) { list.innerHTML = '<p class="empty-state">No transactions yet.</p>'; return; }
+  list.innerHTML = rows.map(t => {
+    const item = items[t.itemId] || { name: 'Deleted item', unit: '' };
+    return `<div class="history-row${t.pending ? ' pending' : ''}">
+      <div class="history-type ${t.type === 'in' ? 'type-in' : 'type-out'}">${t.type === 'in' ? 'IN' : 'OUT'}</div>
+      <div class="history-details">
+        <div class="history-item-name">${item.name}${t.pending ? '<span class="pending-tag">syncing</span>' : ''}</div>
+        <div class="history-meta">${t.date || ''} · ${t.party || '—'}</div>
+      </div>
+      <div class="history-qty">${t.type === 'in' ? '+' : '−'}${formatNumber(t.quantity)} ${item.unit}</div>
+    </div>`;
+  }).join('');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tab + 'Tab').style.display = 'block';
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  if (tab === 'history') renderHistory();
+  if (tab === 'users') renderMembersManage();
+}
+
+function exportExcel() {
+  const rows = Object.keys(items).map(id => {
+    const item = items[id];
+    return { Item: item.name, 'Model number': item.modelNumber || '', Category: item.category || '', Unit: item.unit, 'Current stock': getCurrentStock(id), 'Reorder level': item.reorderLevel || 0 };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Current Stock');
+  XLSX.writeFile(wb, `stock-report-${todayStr()}.xlsx`);
+}
+
+document.getElementById('stockInDate').value = todayStr();
+document.getElementById('stockOutDate').value = todayStr();
+
+/* ---------- offline app shell (only activates once served over https, e.g. GitHub Pages) ---------- */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
