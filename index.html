@@ -216,6 +216,8 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
       <button class="primary-btn" onclick="submitSignup()">Create shop</button>
       <p id="signupError" class="error-text"></p>
     </div>
+
+    <p style="font-size:10px; color:var(--ink-soft); margin-top:22px; font-family:var(--font-mono);">Developed by Ayush Upadhyay</p>
   </div>
 </div>
 
@@ -227,6 +229,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
       <span id="connBadge" class="conn-badge">···</span>
     </div>
     <div class="topbar-actions">
+      <button class="ghost-btn" onclick="openModal('aboutModal')">About</button>
       <button class="ghost-btn" onclick="toggleTheme()" id="themeToggleBtn">Dark</button>
       <button class="ghost-btn" onclick="openModal('changePinModal')">Password</button>
       <button class="ghost-btn" onclick="handleLogout()">Log out</button>
@@ -395,6 +398,18 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
       <button class="primary-btn" style="margin-top:0;" onclick="submitChangePassword()">Save</button>
     </div>
     <p id="changePinError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="aboutModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('aboutModal')">
+  <div class="modal">
+    <h2>About StockTrack</h2>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:14px; line-height:1.6;">A stock register for shops and small factories — tracks what comes in, what goes out, and what's left, automatically. Works offline, installs like an app, and keeps every shop's data completely separate and private.</p>
+    <p style="font-size:13px; color:var(--ink-soft); line-height:1.6;">Multi-shop accounts, admin/viewer roles, low-stock alerts, item photos, and weekly usage reports by email.</p>
+    <div class="modal-actions">
+      <button class="primary-btn" style="margin-top:0;" onclick="closeModal('aboutModal')">Close</button>
+    </div>
+    <p style="font-size:11px; color:var(--ink-soft); text-align:center; margin-top:18px; font-family:var(--font-mono);">Developed by Ayush Upadhyay</p>
   </div>
 </div>
 
