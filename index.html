@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>StockTrack</title>
-<meta name="theme-color" content="#2C4A6E">
+<meta name="theme-color" content="#1B4F91">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="StockTrack">
@@ -21,8 +21,9 @@
   --ink: #211E1A;
   --ink-soft: #5C584F;
   --steel: #B8B4A7;
-  --stamp-blue: #2C4A6E;
-  --stamp-blue-dark: #1E3450;
+  --stamp-blue: #1B4F91;
+  --stamp-blue-bright: #3B82F6;
+  --stamp-blue-dark: #123866;
   --signal-green: #3D6B35;
   --signal-green-bg: #E3EADC;
   --signal-red: #A83A22;
@@ -71,10 +72,10 @@ body {
 .subtitle { color: var(--ink-soft); font-size: 13px; margin: 0 0 18px; }
 .login-card label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 12px 0 6px; text-align: left; }
 .login-card input, .login-card select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
-.login-card input:focus { outline: none; border-color: var(--stamp-blue); }
+.login-card input:focus { outline: none; border-color: var(--stamp-blue-bright); box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
 .auth-tabs { display: flex; border: 1px solid var(--steel); margin-bottom: 18px; }
 .auth-tab { flex: 1; background: transparent; border: none; padding: 10px; font-size: 11px; color: var(--ink-soft); }
-.auth-tab.active { background: var(--stamp-blue); color: #F7F5F0; }
+.auth-tab.active { background: linear-gradient(135deg, var(--stamp-blue-bright) 0%, var(--stamp-blue) 100%); color: #FFFFFF; }
 .username-row { display: flex; gap: 6px; align-items: stretch; }
 .username-row input { flex: 1; }
 .username-row button { white-space: nowrap; padding: 0 12px; font-size: 11px; }
@@ -93,13 +94,33 @@ button {
   border-radius: 2px;
 }
 button:active { transform: translateY(1px); }
-.primary-btn { background: var(--stamp-blue); border-color: var(--stamp-blue); color: #F7F5F0; width: 100%; margin-top: 16px; }
-.primary-btn:hover { background: var(--stamp-blue-dark); }
+.primary-btn {
+  background: linear-gradient(135deg, var(--stamp-blue-bright) 0%, var(--stamp-blue) 65%);
+  border-color: var(--stamp-blue);
+  color: #FFFFFF;
+  width: 100%;
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(27,79,145,0.3);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.primary-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 45%; height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+}
+.primary-btn:hover { background: linear-gradient(135deg, var(--stamp-blue) 0%, var(--stamp-blue-dark) 100%); box-shadow: 0 3px 14px rgba(27,79,145,0.45); }
+.primary-btn:hover::after { left: 125%; }
 .secondary-btn { border-color: var(--signal-red); color: var(--signal-red); }
 .ghost-btn { border-color: var(--steel); color: var(--ink-soft); }
 .theme-toggle-corner { position: absolute; top: 16px; right: 16px; padding: 6px 10px; font-size: 11px; }
 .topbar {
-  background: var(--stamp-blue);
+  background: linear-gradient(120deg, var(--stamp-blue-dark) 0%, var(--stamp-blue) 45%, var(--stamp-blue-bright) 100%);
   color: #F7F5F0;
   display: flex;
   justify-content: space-between;
@@ -107,6 +128,7 @@ button:active { transform: translateY(1px); }
   padding: 14px 20px;
   flex-wrap: wrap;
   gap: 8px;
+  box-shadow: 0 2px 10px rgba(27,79,145,0.25);
 }
 .topbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .topbar h1 { font-family: var(--font-head); font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
@@ -118,7 +140,7 @@ button:active { transform: translateY(1px); }
 .topbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .tabs { display: flex; border-bottom: 1px solid var(--steel); background: var(--paper-card); overflow-x: auto; }
 .tab-btn { flex: 1; border: none; border-bottom: 3px solid transparent; background: transparent; padding: 14px 8px; color: var(--ink-soft); white-space: nowrap; }
-.tab-btn.active { color: var(--ink); border-bottom-color: var(--stamp-blue); }
+.tab-btn.active { color: var(--stamp-blue); border-bottom-color: var(--stamp-blue-bright); border-bottom-width: 3px; }
 main { padding: 16px; max-width: 640px; margin: 0 auto; }
 .action-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
 .action-row button { flex: 1; min-width: 110px; }
@@ -157,7 +179,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
 .bar-row { display: grid; grid-template-columns: 96px 1fr 64px; align-items: center; gap: 8px; padding: 5px 0; }
 .bar-label { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-track { background: var(--paper); border: 0.5px solid var(--steel); height: 14px; border-radius: 2px; overflow: hidden; }
-.bar-fill { background: var(--stamp-blue); height: 100%; }
+.bar-fill { background: linear-gradient(90deg, var(--stamp-blue) 0%, var(--stamp-blue-bright) 100%); height: 100%; }
 .bar-value { font-family: var(--font-mono); font-size: 11px; text-align: right; }
 .qty-stepper { display: flex; align-items: stretch; gap: 6px; }
 .qty-stepper input { text-align: center; }
@@ -171,7 +193,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
 .modal h2 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.06em; font-size: 18px; margin: 0 0 4px; }
 .modal label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 14px 0 6px; }
 .modal input, .modal select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
-.modal input:focus, .modal select:focus { outline: none; border-color: var(--stamp-blue); }
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--stamp-blue-bright); box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
 .modal-actions { display: flex; gap: 8px; margin-top: 24px; }
 .modal-actions button { flex: 1; }
 .error-text { color: var(--signal-red); font-size: 13px; margin: 10px 0 0; min-height: 16px; }
@@ -197,6 +219,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
       <input type="password" id="loginPassword" autocomplete="current-password">
       <button class="primary-btn" onclick="handleLogin()">Log in</button>
       <p id="loginError" class="error-text"></p>
+      <p style="text-align:center; margin-top:14px;"><a href="javascript:void(0)" onclick="openModal('forgotPasswordModal')" style="color:var(--ink-soft); font-size:12px; text-decoration:underline;">Forgot password?</a></p>
     </div>
 
     <div id="signupForm" style="display:none;">
@@ -211,6 +234,8 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
         <button type="button" class="ghost-btn" onclick="checkUsernameAvailability()">Check</button>
       </div>
       <p id="usernameCheckStatus" class="error-text"></p>
+      <label>Recovery email</label>
+      <input type="email" id="signupEmail" autocomplete="email" placeholder="for password-reset codes">
       <label>Password (at least 6 characters)</label>
       <input type="password" id="signupPassword" autocomplete="new-password">
       <button class="primary-btn" onclick="submitSignup()">Create shop</button>
@@ -231,7 +256,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
     <div class="topbar-actions">
       <button class="ghost-btn" onclick="openModal('aboutModal')">About</button>
       <button class="ghost-btn" onclick="toggleTheme()" id="themeToggleBtn">Dark</button>
-      <button class="ghost-btn" onclick="openModal('changePinModal')">Password</button>
+      <button class="ghost-btn" onclick="openAccountModal()">Account</button>
       <button class="ghost-btn" onclick="handleLogout()">Log out</button>
     </div>
   </header>
@@ -284,6 +309,7 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
       </div>
       <div class="action-row">
         <button class="primary-btn" onclick="openModal('addUserModal')" style="margin-top:0;">+ Add person</button>
+        <span id="onlineCountBadge" style="margin-left:10px; font-family:var(--font-mono); font-size:11px; color:var(--signal-green);"></span>
       </div>
       <div id="usersManageList" class="items-list"></div>
     </section>
@@ -376,6 +402,8 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
     <input type="text" id="newMemberName" placeholder="e.g. Ramesh">
     <label>Username</label>
     <input type="text" id="newMemberUsername" placeholder="e.g. ramesh1">
+    <label>Recovery email</label>
+    <input type="email" id="newMemberEmail" autocomplete="email" placeholder="for their own password reset">
     <label>Password (at least 6 characters — a 6-digit number works fine)</label>
     <input type="text" id="newMemberPassword" placeholder="e.g. 583920">
     <label>Role</label>
@@ -393,16 +421,52 @@ select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 
 
 <div id="changePinModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('changePinModal')">
   <div class="modal">
-    <h2>Change my password</h2>
+    <h2>My account</h2>
+    <label>Recovery email (used for "forgot password")</label>
+    <input type="email" id="myRecoveryEmail" autocomplete="email">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('changePinModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="saveRecoveryEmail()">Save email</button>
+    </div>
+    <p id="recoveryEmailStatus" class="error-text"></p>
+    <hr style="border:none; border-top:1px solid var(--steel); margin:18px 0;">
     <label>New password (at least 6 characters)</label>
     <input type="text" id="newPasswordValue" placeholder="e.g. 583920">
     <div class="modal-actions">
       <button class="ghost-btn" onclick="closeModal('changePinModal')">Cancel</button>
-      <button class="primary-btn" style="margin-top:0;" onclick="submitChangePassword()">Save</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitChangePassword()">Save password</button>
     </div>
     <p id="changePinError" class="error-text"></p>
   </div>
 </div>
+
+<div id="forgotPasswordModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('forgotPasswordModal')">
+  <div class="modal">
+    <h2>Reset your password</h2>
+    <p class="subtitle">We'll email a reset link to the recovery email on file for this username.</p>
+    <label>Username</label>
+    <input type="text" id="forgotUsername" autocomplete="username">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('forgotPasswordModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitForgotPassword()">Send reset email</button>
+    </div>
+    <p id="forgotPasswordStatus" class="error-text"></p>
+  </div>
+</div>
+
+<div id="resetPasswordModal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <h2>Set a new password</h2>
+    <p class="subtitle" id="resetPasswordEmailLine"></p>
+    <label>New password (at least 6 characters)</label>
+    <input type="text" id="resetPasswordValue" placeholder="e.g. 583920">
+    <div class="modal-actions">
+      <button class="primary-btn" style="margin-top:0;" onclick="submitConfirmReset()">Save new password</button>
+    </div>
+    <p id="resetPasswordError" class="error-text"></p>
+  </div>
+</div>
+
 
 <div id="aboutModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('aboutModal')">
   <div class="modal">
@@ -460,7 +524,7 @@ const db = firebase.database();
 const EMAIL_SUFFIX = '@stocktrack.local';
 
 let currentUser = null; // { uid, shopId, shopName, username, name, role }
-let items = {}, transactions = {}, shopMembers = {}, pendingQueue = [];
+let items = {}, transactions = {}, shopMembers = {}, pendingQueue = [], presenceData = {};
 let isConnected = false, pendingPhotoData = null;
 let lastCheckedUsername = null, usernameAvailable = false;
 
@@ -551,7 +615,14 @@ function handleLogin() {
   const timeoutId = setTimeout(function () {
     errEl.textContent = 'Taking too long — check your internet connection and try again';
   }, 12000);
-  auth.signInWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function () {
+  db.ref('usernames/' + username).once('value').then(function (snap) {
+    if (!snap.exists()) { throw { code: 'auth/user-not-found' }; }
+    const uid = snap.val();
+    return db.ref('memberEmail/' + uid).once('value').then(function (emailSnap) {
+      const email = emailSnap.exists() ? emailSnap.val() : (username + EMAIL_SUFFIX);
+      return auth.signInWithEmailAndPassword(email, password);
+    });
+  }).then(function () {
     clearTimeout(timeoutId);
   }).catch(function (err) {
     clearTimeout(timeoutId);
@@ -579,19 +650,22 @@ function submitSignup() {
   const shopName = document.getElementById('signupShopName').value.trim();
   const ownerName = document.getElementById('signupOwnerName').value.trim();
   const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
   const password = document.getElementById('signupPassword').value;
   const errEl = document.getElementById('signupError');
-  if (!shopName || !ownerName || !username || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (!shopName || !ownerName || !username || !email || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Enter a valid email — this is what a "forgot password" code goes to'; return; }
   if (password.length < 6) { errEl.textContent = 'Password needs at least 6 characters'; return; }
   if (lastCheckedUsername !== username || !usernameAvailable) { errEl.textContent = 'Please check username availability first'; return; }
   errEl.textContent = 'Creating your shop…';
   signupInProgress = true;
-  auth.createUserWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function (cred) {
+  auth.createUserWithEmailAndPassword(email, password).then(function (cred) {
     const uid = cred.user.uid;
     const shopId = db.ref('shops').push().key;
     return db.ref('usernames/' + username).set(uid)
+      .then(function () { return db.ref('memberEmail/' + uid).set(email); })
       .then(function () { return db.ref('shops/' + shopId).set({ name: shopName, ownerUid: uid, createdAt: Date.now() }); })
-      .then(function () { return db.ref('shopMembers/' + shopId + '/' + uid).set({ username: username, name: ownerName, role: 'admin', createdAt: Date.now() }); })
+      .then(function () { return db.ref('shopMembers/' + shopId + '/' + uid).set({ username: username, name: ownerName, role: 'admin', email: email, createdAt: Date.now() }); })
       .then(function () { return db.ref('userShop/' + uid).set(shopId); })
       .then(function () {
         signupInProgress = false;
@@ -601,15 +675,18 @@ function submitSignup() {
       });
   }).catch(function (err) {
     signupInProgress = false;
-    errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That username is already taken' : err.message;
+    errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That email is already registered to another account' : err.message;
   });
 }
 
 function handleLogout() {
   if (currentUser) {
+    db.ref('shops/' + currentUser.shopId + '/presence/' + currentUser.uid).set({ online: false, name: currentUser.name, lastChanged: firebase.database.ServerValue.TIMESTAMP }).catch(function () {});
     db.ref('shops/' + currentUser.shopId + '/items').off();
     db.ref('shops/' + currentUser.shopId + '/transactions').off();
     db.ref('shops/' + currentUser.shopId + '/settings').off();
+    db.ref('shops/' + currentUser.shopId + '/presence').off();
+    db.ref('userShop/' + currentUser.uid).off();
     db.ref('shopMembers/' + currentUser.shopId).off();
   }
   db.ref('.info/connected').off();
@@ -658,7 +735,22 @@ function loadData() {
   db.ref('.info/connected').on('value', snap => {
     isConnected = snap.val() === true;
     updateConnBadge();
-    if (isConnected) flushPendingQueue();
+    if (isConnected) {
+      flushPendingQueue();
+      const presRef = db.ref('shops/' + shopId + '/presence/' + currentUser.uid);
+      presRef.onDisconnect().set({ online: false, name: currentUser.name, lastChanged: firebase.database.ServerValue.TIMESTAMP })
+        .then(() => presRef.set({ online: true, name: currentUser.name, lastChanged: firebase.database.ServerValue.TIMESTAMP }));
+    }
+  });
+  db.ref('shops/' + shopId + '/presence').on('value', snap => {
+    presenceData = snap.val() || {};
+    if (currentUser.role === 'admin') renderMembersManage();
+  });
+  db.ref('userShop/' + currentUser.uid).on('value', snap => {
+    if (!snap.exists() && currentUser) {
+      alert('Your access to this shop has been removed by the owner.');
+      handleLogout();
+    }
   });
   db.ref('shops/' + shopId + '/items').on('value', snap => {
     items = snap.val() || {};
@@ -812,17 +904,35 @@ function renderItemsManage() {
 function renderMembersManage() {
   const list = document.getElementById('usersManageList');
   if (!list) return;
-  const ids = Object.keys(shopMembers);
+  const ids = Object.keys(shopMembers).filter(uid => !shopMembers[uid].removed);
+  const badge = document.getElementById('onlineCountBadge');
+  if (badge) {
+    const onlineCount = ids.filter(uid => presenceData[uid] && presenceData[uid].online).length;
+    badge.textContent = ids.length ? ('● ' + onlineCount + ' of ' + ids.length + ' online') : '';
+  }
   if (ids.length === 0) { list.innerHTML = '<p class="empty-state">No team members yet.</p>'; return; }
   list.innerHTML = ids.map(uid => {
     const m = shopMembers[uid];
+    const online = presenceData[uid] && presenceData[uid].online;
+    const isSelf = currentUser && uid === currentUser.uid;
     return `<div class="item-row">
       <div>
-        <div class="item-name">${m.name} <span class="model-tag">@${m.username}</span></div>
-        <div class="item-category">${(m.role || 'viewer') === 'admin' ? 'Admin — can edit' : 'Viewer — can only see'}</div>
+        <div class="item-name"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:${online ? 'var(--signal-green)' : 'var(--ink-soft)'};"></span>${m.name} <span class="model-tag">@${m.username}</span></div>
+        <div class="item-category">${(m.role || 'viewer') === 'admin' ? 'Admin — can edit' : 'Viewer — can only see'} · ${online ? 'Online now' : 'Offline'}</div>
       </div>
+      ${isSelf ? '' : `<button class="ghost-btn" style="border-color:var(--signal-red); color:var(--signal-red);" onclick="removeMember('${uid}')">Remove</button>`}
     </div>`;
   }).join('');
+}
+
+function removeMember(uid) {
+  const m = shopMembers[uid];
+  if (!m || !currentUser) return;
+  if (!confirm('Remove ' + m.name + ' from the team? They will lose access right away.')) return;
+  const shopId = currentUser.shopId;
+  db.ref('userShop/' + uid).remove()
+    .then(function () { return db.ref('shopMembers/' + shopId + '/' + uid).update({ removed: true, removedAt: Date.now() }); })
+    .catch(function (err) { alert('Could not remove: ' + err.message); });
 }
 
 function populateItemDropdowns() {
@@ -938,10 +1048,12 @@ function submitNewItem() {
 function submitNewMember() {
   const name = document.getElementById('newMemberName').value.trim();
   const username = document.getElementById('newMemberUsername').value.trim().toLowerCase();
+  const email = document.getElementById('newMemberEmail').value.trim().toLowerCase();
   const password = document.getElementById('newMemberPassword').value;
   const role = document.getElementById('newMemberRole').value;
   const errEl = document.getElementById('addMemberError');
-  if (!name || !username || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (!name || !username || !email || !password) { errEl.textContent = 'Fill in every field'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Enter a valid email'; return; }
   if (password.length < 6) { errEl.textContent = 'Password needs at least 6 characters'; return; }
   if (!isConnected) { errEl.textContent = 'Needs internet to add a person'; return; }
   errEl.textContent = 'Checking username…';
@@ -949,10 +1061,11 @@ function submitNewMember() {
     if (snap.exists()) { errEl.textContent = 'That username is already taken'; return; }
     errEl.textContent = 'Creating…';
     const shopId = currentUser.shopId;
-    secondaryAuth.createUserWithEmailAndPassword(username + EMAIL_SUFFIX, password).then(function (cred) {
+    secondaryAuth.createUserWithEmailAndPassword(email, password).then(function (cred) {
       const newUid = cred.user.uid;
       return db.ref('usernames/' + username).set(newUid)
-        .then(function () { return db.ref('shopMembers/' + shopId + '/' + newUid).set({ username: username, name: name, role: role, createdAt: Date.now() }); })
+        .then(function () { return db.ref('memberEmail/' + newUid).set(email); })
+        .then(function () { return db.ref('shopMembers/' + shopId + '/' + newUid).set({ username: username, name: name, role: role, email: email, createdAt: Date.now() }); })
         .then(function () { return db.ref('userShop/' + newUid).set(shopId); })
         .then(function () { return secondaryAuth.signOut(); });
     }).then(function () {
@@ -960,9 +1073,10 @@ function submitNewMember() {
       closeModal('addUserModal');
       document.getElementById('newMemberName').value = '';
       document.getElementById('newMemberUsername').value = '';
+      document.getElementById('newMemberEmail').value = '';
       document.getElementById('newMemberPassword').value = '';
     }).catch(function (err) {
-      errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That username is already taken' : err.message;
+      errEl.textContent = err.code === 'auth/email-already-in-use' ? 'That email is already registered to another account' : err.message;
     });
   });
 }
@@ -979,6 +1093,99 @@ function submitChangePassword() {
     document.getElementById('newPasswordValue').value = '';
   }).catch(function (err) {
     errEl.textContent = err.code === 'auth/requires-recent-login' ? 'Please log out, log back in, then try again' : err.message;
+  });
+}
+
+/* ---------- account: recovery email (needed for "forgot password" to work) ---------- */
+function openAccountModal() {
+  document.getElementById('recoveryEmailStatus').textContent = '';
+  const email = auth.currentUser ? auth.currentUser.email : '';
+  document.getElementById('myRecoveryEmail').value = (email && !email.endsWith(EMAIL_SUFFIX)) ? email : '';
+  openModal('changePinModal');
+}
+
+function saveRecoveryEmail() {
+  const email = document.getElementById('myRecoveryEmail').value.trim().toLowerCase();
+  const statusEl = document.getElementById('recoveryEmailStatus');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { statusEl.textContent = 'Enter a valid email'; statusEl.style.color = ''; return; }
+  const user = auth.currentUser;
+  if (!user || !currentUser) { statusEl.textContent = 'Please log in again'; statusEl.style.color = ''; return; }
+  statusEl.textContent = 'Saving…'; statusEl.style.color = '';
+  user.updateEmail(email).then(function () {
+    return db.ref('memberEmail/' + currentUser.uid).set(email);
+  }).then(function () {
+    return db.ref('shopMembers/' + currentUser.shopId + '/' + currentUser.uid + '/email').set(email);
+  }).then(function () {
+    statusEl.textContent = 'Saved — "forgot password" will send codes here now.';
+    statusEl.style.color = 'var(--signal-green)';
+  }).catch(function (err) {
+    statusEl.textContent = err.code === 'auth/requires-recent-login' ? 'Please log out, log back in, then try again'
+      : err.code === 'auth/email-already-in-use' ? 'That email is already on another account' : err.message;
+    statusEl.style.color = '';
+  });
+}
+
+/* ---------- forgot password — real Firebase reset email, not a custom OTP ----------
+   Needs one Firebase Console step to land back on THIS app instead of Firebase's
+   generic page: Authentication → Templates → Password reset → pencil icon →
+   Customize action URL → set it to your GitHub Pages URL. */
+const APP_URL = 'https://ayushup495.github.io/stock-tracker/'; // ⚠ confirm this is your actual Pages URL
+let pendingResetCode = null;
+
+function submitForgotPassword() {
+  const username = document.getElementById('forgotUsername').value.trim().toLowerCase();
+  const statusEl = document.getElementById('forgotPasswordStatus');
+  if (!username) { statusEl.textContent = 'Enter your username'; statusEl.style.color = ''; return; }
+  if (username.indexOf('@') !== -1) { statusEl.textContent = 'Enter your username, not your email — the username you picked (or were given) when your account was created.'; statusEl.style.color = ''; return; }
+  statusEl.textContent = 'Looking up your account…'; statusEl.style.color = '';
+  try {
+    db.ref('usernames/' + username).once('value').then(function (snap) {
+      if (!snap.exists()) { statusEl.textContent = 'No account with that username'; return; }
+      const uid = snap.val();
+      return db.ref('memberEmail/' + uid).once('value').then(function (emailSnap) {
+        if (!emailSnap.exists()) {
+          statusEl.textContent = 'No recovery email on file for this account — ask your shop admin, or add one from Account after logging in.';
+          return;
+        }
+        return auth.sendPasswordResetEmail(emailSnap.val(), { url: APP_URL, handleCodeInApp: true }).then(function () {
+          statusEl.textContent = 'Reset link sent — check that inbox (and spam folder).';
+          statusEl.style.color = 'var(--signal-green)';
+        });
+      });
+    }).catch(function (err) {
+      statusEl.textContent = err.code === 'auth/too-many-requests' ? 'Too many attempts — try again later' : err.message;
+    });
+  } catch (err) {
+    statusEl.textContent = 'Something went wrong looking that up — try again.';
+  }
+}
+
+/* landing back here from the emailed link (?mode=resetPassword&oobCode=...) */
+(function checkForResetLink() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'resetPassword' && params.get('oobCode')) {
+    const oobCode = params.get('oobCode');
+    auth.verifyPasswordResetCode(oobCode).then(function (email) {
+      pendingResetCode = oobCode;
+      document.getElementById('resetPasswordEmailLine').textContent = 'Resetting the password for ' + email;
+      document.getElementById('resetPasswordModal').style.display = 'flex';
+    }).catch(function () {
+      alert('That reset link is invalid or has expired. Request a new one from the login screen.');
+    });
+  }
+})();
+
+function submitConfirmReset() {
+  const newPassword = document.getElementById('resetPasswordValue').value;
+  const errEl = document.getElementById('resetPasswordError');
+  if (!newPassword || newPassword.length < 6) { errEl.textContent = 'Needs at least 6 characters'; return; }
+  if (!pendingResetCode) { errEl.textContent = 'This link is no longer valid — request a new one'; return; }
+  auth.confirmPasswordReset(pendingResetCode, newPassword).then(function () {
+    document.getElementById('resetPasswordModal').style.display = 'none';
+    window.history.replaceState({}, '', window.location.pathname);
+    alert('Password updated — log in with your new password.');
+  }).catch(function (err) {
+    errEl.textContent = err.code === 'auth/expired-action-code' ? 'This link expired — request a new one' : err.message;
   });
 }
 
