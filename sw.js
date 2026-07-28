@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stocktrack-v1';
+const CACHE_NAME = 'stocktrack-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -34,6 +34,21 @@ self.addEventListener('fetch', event => {
   const url = event.request.url;
   // Always go straight to the network for Firebase database traffic - never serve stale stock data from cache
   if (url.indexOf('firebasedatabase.app') !== -1 || url.indexOf('firebaseio.com') !== -1) {
+    return;
+  }
+  // Our own app shell: try the network FIRST so a fresh deploy shows up on the very next load,
+  // not two loads later. Only fall back to cache when there's no connection at all.
+  const isAppShell = url.indexOf('/index.html') !== -1 || url.indexOf('/manifest.json') !== -1 || url.endsWith('/stock-tracker/') || url.endsWith('/stock-tracker');
+  if (isAppShell) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
     return;
   }
   event.respondWith(
