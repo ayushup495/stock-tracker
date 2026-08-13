@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>StockTrack</title>
+<meta name="theme-color" content="#1B4F91">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StockTrack">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #EDEAE2;
+  --paper-card: #F7F5F0;
+  --ink: #211E1A;
+  --ink-soft: #5C584F;
+  --steel: #B8B4A7;
+  --stamp-blue: #1B4F91;
+  --stamp-blue-bright: #3B82F6;
+  --stamp-blue-dark: #123866;
+  --signal-green: #3D6B35;
+  --signal-green-bg: #E3EADC;
+  --signal-red: #A83A22;
+  --signal-red-bg: #F2DFD5;
+  --signal-amber: #A67C27;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-head: 'IBM Plex Sans Condensed', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+body[data-theme="dark"] {
+  --paper: #1C1A17;
+  --paper-card: #262320;
+  --ink: #ECE8E0;
+  --ink-soft: #A8A296;
+  --steel: #4A463F;
+  --signal-green-bg: #24331F;
+  --signal-red-bg: #3A241C;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.15s, color 0.15s;
+}
+.screen { min-height: 100vh; }
+#loginView { display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; }
+.login-card {
+  background: var(--paper-card);
+  border: 1px solid var(--steel);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+.login-card h1 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 24px;
+  margin: 0 0 20px;
+  text-transform: uppercase;
+}
+.subtitle { color: var(--ink-soft); font-size: 13px; margin: 0 0 18px; }
+.login-card label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 12px 0 6px; text-align: left; }
+.login-card input, .login-card select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+.login-card input:focus { outline: none; border-color: var(--stamp-blue-bright); box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
+.auth-tabs { display: flex; border: 1px solid var(--steel); margin-bottom: 18px; }
+.auth-tab { flex: 1; background: transparent; border: none; padding: 10px; font-size: 11px; color: var(--ink-soft); }
+.auth-tab.active { background: linear-gradient(135deg, var(--stamp-blue-bright) 0%, var(--stamp-blue) 100%); color: #FFFFFF; }
+.username-row { display: flex; gap: 6px; align-items: stretch; }
+.username-row input { flex: 1; }
+.username-row button { white-space: nowrap; padding: 0 12px; font-size: 11px; }
+#pinInput { display: none; }
+button {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 11px 18px;
+  border-radius: 2px;
+}
+button:active { transform: translateY(1px); }
+.primary-btn {
+  background: linear-gradient(135deg, var(--stamp-blue-bright) 0%, var(--stamp-blue) 65%);
+  border-color: var(--stamp-blue);
+  color: #FFFFFF;
+  width: 100%;
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(27,79,145,0.3);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.primary-btn::after {
+  content: ';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 45%; height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+}
+.primary-btn:hover { background: linear-gradient(135deg, var(--stamp-blue) 0%, var(--stamp-blue-dark) 100%); box-shadow: 0 3px 14px rgba(27,79,145,0.45); }
+.primary-btn:hover::after { left: 125%; }
+.secondary-btn { border-color: var(--signal-red); color: var(--signal-red); }
+.ghost-btn { border-color: var(--steel); color: var(--ink-soft); }
+.theme-toggle-corner { position: absolute; top: 16px; right: 16px; padding: 6px 10px; font-size: 11px; }
+.topbar {
+  background: linear-gradient(120deg, var(--stamp-blue-dark) 0%, var(--stamp-blue) 45%, var(--stamp-blue-bright) 100%);
+  color: #F7F5F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: 0 2px 10px rgba(27,79,145,0.25);
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.topbar h1 { font-family: var(--font-head); font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+.user-badge { font-size: 12px; opacity: 0.8; font-family: var(--font-mono); }
+.topbar .ghost-btn { border-color: rgba(247,245,240,0.4); color: #F7F5F0; padding: 7px 11px; font-size: 11px; }
+.conn-badge { font-family: var(--font-mono); font-size: 10px; padding: 3px 7px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,255,255,0.14); }
+.conn-badge.online { color: #BFE0B4; }
+.conn-badge.offline { color: #F0B8A8; }
+.topbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs { display: flex; border-bottom: 1px solid var(--steel); background: var(--paper-card); overflow-x: auto; }
+.tab-btn { flex: 1; border: none; border-bottom: 3px solid transparent; background: transparent; padding: 14px 8px; color: var(--ink-soft); white-space: nowrap; }
+.tab-btn.active { color: var(--stamp-blue); border-bottom-color: var(--stamp-blue-bright); border-bottom-width: 3px; }
+main { padding: 16px; max-width: 640px; margin: 0 auto; }
+.action-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.action-row button { flex: 1; min-width: 110px; }
+.items-list, .history-list { display: flex; flex-direction: column; gap: 1px; }
+.item-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--paper-card); border-left: 4px solid var(--signal-green); padding: 12px 16px;
+}
+.item-row.low-stock { border-left-color: var(--signal-red); }
+.item-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.item-thumb { width: 42px; height: 42px; object-fit: cover; border: 1px solid var(--steel); border-radius: 2px; flex-shrink: 0; }
+.item-thumb-placeholder { width: 42px; height: 42px; border: 1px dashed var(--steel); border-radius: 2px; flex-shrink: 0; }
+.item-name { font-weight: 500; font-size: 15px; }
+.model-tag { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); font-weight: 400; }
+.item-category { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.item-stock { text-align: right; flex-shrink: 0; }
+.stock-value { font-family: var(--font-mono); font-size: 16px; font-weight: 500; }
+.stock-status { font-family: var(--font-head); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--signal-green); margin-top: 2px; }
+.item-row.low-stock .stock-status { color: var(--signal-red); }
+.history-row { display: flex; align-items: center; gap: 12px; background: var(--paper-card); padding: 12px 16px; border-left: 4px solid var(--steel); }
+.history-row.pending { border-left-color: var(--signal-amber); }
+.history-type { font-family: var(--font-mono); font-size: 11px; font-weight: 500; padding: 3px 7px; letter-spacing: 0.05em; white-space: nowrap; }
+.type-in { background: var(--signal-green-bg); color: var(--signal-green); }
+.type-out { background: var(--signal-red-bg); color: var(--signal-red); }
+.history-details { flex: 1; min-width: 0; }
+.history-item-name { font-size: 14px; font-weight: 500; }
+.pending-tag { font-size: 10px; color: var(--signal-amber); margin-left: 6px; font-family: var(--font-mono); text-transform: uppercase; }
+.history-meta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.history-qty { font-family: var(--font-mono); font-size: 14px; white-space: nowrap; }
+select#historyFilter { width: 100%; margin-bottom: 12px; padding: 10px; border: 1px solid var(--steel); background: var(--paper-card); font-family: var(--font-body); color: var(--ink); }
+.empty-state { color: var(--ink-soft); font-size: 14px; text-align: center; padding: 32px 16px; }
+.offline-note { font-size: 12px; color: var(--signal-amber); background: #FBF1DD; border: 1px solid #E6CE8F; padding: 8px 12px; margin-bottom: 12px; display: none; }
+.offline-note.show { display: block; }
+.insight-box { background: var(--paper-card); border: 1px solid var(--steel); padding: 14px 16px; margin-bottom: 16px; }
+.insight-box h3 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; margin: 0 0 12px; color: var(--ink-soft); }
+.bar-row { display: grid; grid-template-columns: 96px 1fr 64px; align-items: center; gap: 8px; padding: 5px 0; }
+.bar-label { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { background: var(--paper); border: 0.5px solid var(--steel); height: 14px; border-radius: 2px; overflow: hidden; }
+.bar-fill { background: linear-gradient(90deg, var(--stamp-blue) 0%, var(--stamp-blue-bright) 100%); height: 100%; }
+.bar-value { font-family: var(--font-mono); font-size: 11px; text-align: right; }
+.qty-stepper { display: flex; align-items: stretch; gap: 6px; }
+.qty-stepper input { text-align: center; }
+.stepper-btn { padding: 0 16px; font-size: 18px; line-height: 1; }
+.settings-box { background: var(--paper-card); border: 1px solid var(--steel); padding: 14px 16px; margin-bottom: 16px; }
+.settings-box h3 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; margin: 0 0 10px; color: var(--ink-soft); }
+.settings-box input { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; margin-bottom: 8px; }
+.photo-preview { max-width: 110px; max-height: 110px; margin-top: 8px; border: 1px solid var(--steel); display: none; }
+.item-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 7px; }
+.item-actions button { padding: 6px 8px; font-size: 10px; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+.checkbox-row input { width: auto; margin: 0; }
+.app-dialog-message { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 14px 0 0; }
+.app-toast { position: fixed; left: 50%; bottom: 20px; z-index: 50; width: min(420px, calc(100vw - 32px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--paper-card); color: var(--ink); border: 1px solid var(--steel); border-left: 4px solid var(--stamp-blue-bright); padding: 12px 14px; box-shadow: 0 8px 24px rgba(33,30,26,0.24); font-size: 13px; line-height: 1.45; transition: opacity 0.2s ease, transform 0.2s ease; }
+.app-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.app-toast.success { border-left-color: var(--signal-green); }
+.app-toast.error { border-left-color: var(--signal-red); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(33,30,26,0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 10; }
+.modal { background: var(--paper-card); border: 1px solid var(--steel); padding: 28px 24px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.06em; font-size: 18px; margin: 0 0 4px; }
+.modal label { display: block; font-family: var(--font-head); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); margin: 14px 0 6px; }
+.modal input, .modal select { width: 100%; padding: 10px; border: 1px solid var(--steel); background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--stamp-blue-bright); box-shadow: 0 0 0 3px rgba(59,130,246,0.18); }
+.modal-actions { display: flex; gap: 8px; margin-top: 24px; }
+.modal-actions button { flex: 1; }
+.error-text { color: var(--signal-red); font-size: 13px; margin: 10px 0 0; min-height: 16px; }
+/* ---------- free modern interface upgrade ---------- */
+:root { --accent-cyan: #35C6E8; --accent-violet: #7C5CFC; --surface-glow: rgba(53,198,232,0.12); }
+body { background: radial-gradient(circle at top left, rgba(53,198,232,0.10), transparent 30%), var(--paper); }
+body[data-theme="dark"] { background: radial-gradient(circle at top left, rgba(53,198,232,0.12), transparent 32%), var(--paper); }
+.topbar { background: linear-gradient(115deg, #102A56 0%, #1B4F91 48%, #35A9D6 100%); padding: 16px 20px; }
+.topbar h1::before { content: '◆'; color: #8BE9FF; font-size: 13px; margin-right: 8px; }
+.tabs { position: sticky; top: 0; z-index: 4; box-shadow: 0 4px 14px rgba(19,44,82,0.08); }
+.tab-btn { min-width: 108px; font-size: 12px; }
+.tab-btn.active { color: var(--stamp-blue); background: linear-gradient(180deg, var(--surface-glow), transparent); }
+main { max-width: 760px; padding: 20px 16px 36px; }
+.insight-box, .settings-box, .item-row, .history-row { border-radius: 10px; box-shadow: 0 5px 16px rgba(31,39,54,0.06); }
+.item-row, .history-row { margin-bottom: 7px; border: 1px solid var(--steel); border-left: 4px solid var(--signal-green); transition: transform 0.16s ease, box-shadow 0.16s ease; }
+.item-row:hover, .history-row:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(31,39,54,0.10); }
+.primary-btn { border-radius: 8px; background: linear-gradient(135deg, var(--accent-violet), var(--stamp-blue-bright) 55%, var(--accent-cyan)); border: none; }
+.secondary-btn, .ghost-btn { border-radius: 8px; }
+.dashboard-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 0 0 16px; }
+.metric-card { background: var(--paper-card); border: 1px solid var(--steel); border-radius: 10px; padding: 13px 12px; box-shadow: 0 5px 14px rgba(31,39,54,0.05); }
+.metric-value { font-family: var(--font-mono); font-size: 21px; font-weight: 500; color: var(--stamp-blue); }
+.metric-label { font-family: var(--font-head); font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 5px; }
+.history-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 12px 0 0; color: var(--ink-soft); font-size: 12px; }
+.history-footer button { padding: 8px 11px; font-size: 11px; }
+.supplier-row { display: flex; align-items: center; gap: 12px; background: var(--paper-card); border: 1px solid var(--steel); border-radius: 10px; padding: 13px 14px; margin-bottom: 8px; }
+.supplier-icon { width: 36px; height: 36px; display: grid; place-items: center; flex-shrink: 0; border-radius: 9px; background: linear-gradient(135deg, var(--accent-violet), var(--accent-cyan)); color: #fff; font-size: 17px; }
+.supplier-details { flex: 1; min-width: 0; }
+.scanner-video { width: 100%; margin-top: 12px; border-radius: 10px; background: #000; aspect-ratio: 4 / 3; object-fit: cover; }
+.scan-hint { font-size: 12px; color: var(--ink-soft); line-height: 1.5; margin: 10px 0 0; }
+.scan-btn { padding: 8px 10px; font-size: 11px; margin-top: 8px; }
+@media (max-width: 420px) { .dashboard-summary { gap: 6px; } .metric-card { padding: 11px 9px; } .metric-value { font-size: 18px; } .item-row, .history-row { padding: 11px 12px; } }
+</style>
+</head>
+<body>
+
+<div id="loginView" class="screen">
+  <button class="ghost-btn theme-toggle-corner" onclick="toggleTheme()" id="themeToggleBtnLogin">Dark</button>
+  <div class="login-card">
+    <h1>StockTrack</h1>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTabBtn" onclick="switchAuthMode('login')">Log in</button>
+      <button class="auth-tab" id="signupTabBtn" onclick="switchAuthMode('signup')">Create new shop</button>
+    </div>
+
+    <div id="loginForm">
+      <p class="subtitle">Enter your username or email and password</p>
+      <label>Username or email</label>
+      <input type="text" id="loginUsername" autocomplete="username email" autocapitalize="none">
+      <label>Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password">
+      <button class="primary-btn" onclick="handleLogin()">Log in</button>
+      <p id="loginError" class="error-text"></p>
+      <p style="text-align:center; margin-top:14px;"><a href="javascript:void(0)" onclick="openModal('forgotPasswordModal')" style="color:var(--ink-soft); font-size:12px; text-decoration:underline;">Forgot password?</a></p>
+    </div>
+
+    <div id="signupForm" style="display:none;">
+      <p class="subtitle">Sets up a brand new, separate shop</p>
+      <label>Shop name</label>
+      <input type="text" id="signupShopName" placeholder="e.g. ABCD Traders">
+      <label>Your name</label>
+      <input type="text" id="signupOwnerName" placeholder="e.g. Ramesh">
+      <label>Choose a username</label>
+      <div class="username-row">
+        <input type="text" id="signupUsername" autocomplete="username">
+        <button type="button" class="ghost-btn" onclick="checkUsernameAvailability()">Check</button>
+      </div>
+      <p id="usernameCheckStatus" class="error-text"></p>
+      <label>Recovery email</label>
+      <input type="email" id="signupEmail" autocomplete="email" placeholder="for password-reset codes">
+      <label>Password (at least 6 characters)</label>
+      <input type="password" id="signupPassword" autocomplete="new-password">
+      <button class="primary-btn" onclick="submitSignup()">Create shop</button>
+      <p id="signupError" class="error-text"></p>
+    </div>
+
+    <p style="font-size:10px; color:var(--ink-soft); margin-top:22px; font-family:var(--font-mono);">Developed by Ayush Upadhyay</p>
+  </div>
+</div>
+
+<div id="appView" class="screen" style="display:none;">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>StockTrack</h1>
+      <span id="userName" class="user-badge"></span>
+      <span id="connBadge" class="conn-badge">···</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="ghost-btn" onclick="openModal('aboutModal')">About</button>
+      <button class="ghost-btn" onclick="toggleTheme()" id="themeToggleBtn">Dark</button>
+      <button class="ghost-btn" onclick="openAccountModal()">Account</button>
+      <button class="ghost-btn" onclick="handleLogout()">Log out</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" data-tab="history" onclick="switchTab('history')">History</button>
+    <button class="tab-btn" data-tab="items" onclick="switchTab('items')">Items</button>
+    <button class="tab-btn" id="suppliersTabBtn" data-tab="suppliers" onclick="switchTab('suppliers')" style="display:none;">Suppliers</button>
+    <button class="tab-btn" id="usersTabBtn" data-tab="users" onclick="switchTab('users')" style="display:none;">Team</button>
+  </nav>
+
+  <main>
+    <section id="dashboardTab" class="tab-content">
+      <p id="offlineNote" class="offline-note">You're offline — showing the last saved data. New entries will be saved and synced once you're back online.</p>
+      <div id="dashboardSummary" class="dashboard-summary"></div>
+      <div class="insight-box">
+        <h3>Most used this week</h3>
+        <div id="topUsedChart"></div>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" id="stockInBtn" onclick="openModal('stockInModal')" style="display:none; margin-top:0;">+ Stock in</button>
+        <button class="secondary-btn" id="stockOutBtn" onclick="openModal('stockOutModal')" style="display:none;">− Stock out</button>
+        <button class="ghost-btn" onclick="exportExcel()">Export excel</button>
+      </div>
+      <div id="itemsList" class="items-list"></div>
+    </section>
+
+    <section id="historyTab" class="tab-content" style="display:none;">
+      <div class="action-row">
+        <select id="historyFilter" onchange="resetHistoryPagination()" style="flex:1; margin-bottom:0;">
+          <option value="">All items</option>
+        </select>
+        <button class="ghost-btn" id="clearHistoryBtn" onclick="openClearHistoryModal()" style="display:none;">Clear old history</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+      <div id="historyFooter" class="history-footer" style="display:none;"><span id="historyCount"></span><button id="historyLoadMoreBtn" class="ghost-btn" onclick="loadMoreHistory()">Load more</button></div>
+    </section>
+
+    <section id="itemsTab" class="tab-content" style="display:none;">
+      <div class="action-row">
+        <button class="primary-btn" id="addItemBtn" onclick="openModal('addItemModal')" style="display:none; margin-top:0;">+ Add item</button>
+      </div>
+      <div id="itemsManageList" class="items-list"></div>
+    </section>
+
+    <section id="suppliersTab" class="tab-content" style="display:none;">
+      <div class="action-row"><button class="primary-btn" id="addSupplierBtn" onclick="openSupplierModal()" style="margin-top:0;">+ Add supplier</button></div>
+      <div id="suppliersManageList" class="items-list"></div>
+    </section>
+    <section id="usersTab" class="tab-content" style="display:none;">
+      <div class="settings-box">
+        <h3>Weekly report email</h3>
+        <input type="email" id="reportEmailInput" placeholder="owner@example.com">
+        <button class="primary-btn" onclick="saveReportEmail()" style="margin-top:0;">Save email</button>
+        <p id="reportEmailStatus" class="error-text"></p>
+      </div>
+      <div class="action-row">
+        <button class="primary-btn" onclick="openModal('addUserModal')" style="margin-top:0;">+ Add person</button>
+        <span id="onlineCountBadge" style="margin-left:10px; font-family:var(--font-mono); font-size:11px; color:var(--signal-green);"></span>
+      </div>
+      <div id="usersManageList" class="items-list"></div>
+    </section>
+  </main>
+</div>
+
+<div id="stockInModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('stockInModal')">
+  <div class="modal">
+    <h2>Stock in</h2>
+    <label>Item</label>
+    <select id="stockInItem"></select>
+    <button type="button" class="ghost-btn scan-btn" onclick="openBarcodeScanner('stockInItem')">Scan barcode</button>
+    <label>Transaction type</label><select id="stockInReason"><option value="purchase">Purchase</option><option value="return">Customer return</option><option value="adjustment">Stock adjustment</option></select>
+    <label>Quantity</label>
+    <div class="qty-stepper">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockInQty',-1)">−</button>
+      <input type="number" id="stockInQty" min="0" step="any">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockInQty',1)">+</button>
+    </div>
+    <label>Source / supplier</label>
+    <input type="text" id="stockInSource" list="supplierDatalist" placeholder="e.g. ABC Traders"><datalist id="supplierDatalist"></datalist>
+    <label>Date</label>
+    <input type="date" id="stockInDate">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('stockInModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitStockIn()">Save</button>
+    </div>
+    <p id="stockInError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="stockOutModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('stockOutModal')">
+  <div class="modal">
+    <h2>Stock out</h2>
+    <label>Item</label>
+    <select id="stockOutItem"></select>
+    <button type="button" class="ghost-btn scan-btn" onclick="openBarcodeScanner('stockOutItem')">Scan barcode</button>
+    <label>Transaction type</label><select id="stockOutReason"><option value="sale">Sale</option><option value="usage">Used / issued</option><option value="adjustment">Stock adjustment</option></select>
+    <label>Quantity</label>
+    <div class="qty-stepper">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockOutQty',-1)">−</button>
+      <input type="number" id="stockOutQty" min="0" step="any">
+      <button type="button" class="stepper-btn ghost-btn" onclick="adjustQty('stockOutQty',1)">+</button>
+    </div>
+    <label>Used for / issued to</label>
+    <input type="text" id="stockOutPurpose" placeholder="e.g. Production batch 12">
+    <label>Date</label>
+    <input type="date" id="stockOutDate">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('stockOutModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitStockOut()">Save</button>
+    </div>
+    <p id="stockOutError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="addItemModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('addItemModal')">
+  <div class="modal">
+    <h2>Add item</h2>
+    <label>Item name</label>
+    <input type="text" id="newItemName" placeholder="e.g. Steel sheets">
+    <label>Model number (optional)</label>
+    <input type="text" id="newItemModel" placeholder="e.g. XJ-2000">
+    <label>Barcode (optional)</label><input type="text" id="newItemBarcode" inputmode="numeric" placeholder="Scan or type barcode">
+    <label>Unit</label>
+    <select id="newItemUnit">
+      <option value="kg">kg</option>
+      <option value="litre">litre</option>
+      <option value="pieces">pieces</option>
+      <option value="box">box</option>
+      <option value="bag">bag</option>
+      <option value="ton">ton</option>
+    </select>
+    <label>Category</label>
+    <input type="text" id="newItemCategory" placeholder="e.g. Raw material">
+    <label>Opening stock (what's already in the shop today)</label>
+    <input type="number" id="newItemOpening" min="0" step="any" value="0">
+    <label>Reorder level (alert when stock falls below this)</label>
+    <input type="number" id="newItemReorder" min="0" step="any" value="0">
+    <label>Photo (optional, helps find it on the shelf)</label>
+    <input type="file" accept="image/*" id="newItemPhotoFile" onchange="previewItemPhoto(event)">
+    <img id="newItemPhotoPreview" class="photo-preview">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('addItemModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitNewItem()">Save</button>
+    </div>
+    <p id="addItemError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="editItemModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('editItemModal')">
+  <div class="modal">
+    <h2>Edit item</h2>
+    <label>Item name</label>
+    <input type="text" id="editItemName">
+    <label>Model number (optional)</label>
+    <input type="text" id="editItemModel">
+    <label>Barcode (optional)</label><input type="text" id="editItemBarcode" inputmode="numeric">
+    <label>Unit</label>
+    <select id="editItemUnit">
+      <option value="kg">kg</option>
+      <option value="litre">litre</option>
+      <option value="pieces">pieces</option>
+      <option value="box">box</option>
+      <option value="bag">bag</option>
+      <option value="ton">ton</option>
+    </select>
+    <label>Category</label>
+    <input type="text" id="editItemCategory">
+    <label>Opening stock (changes the current total)</label>
+    <input type="number" id="editItemOpening" min="0" step="any">
+    <label>Reorder level</label>
+    <input type="number" id="editItemReorder" min="0" step="any">
+    <label>Replace photo (optional)</label>
+    <input type="file" accept="image/*" id="editItemPhotoFile" onchange="previewEditItemPhoto(event)">
+    <img id="editItemPhotoPreview" class="photo-preview">
+    <label class="checkbox-row"><input type="checkbox" id="editItemRemovePhoto"> Remove the current photo</label>
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('editItemModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitEditItem()">Save changes</button>
+    </div>
+    <p id="editItemError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="supplierModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('supplierModal')">
+  <div class="modal"><h2 id="supplierModalTitle">Add supplier</h2>
+    <label>Supplier name</label><input type="text" id="supplierName" placeholder="e.g. ABC Traders">
+    <label>Phone (optional)</label><input type="tel" id="supplierPhone" placeholder="e.g. 9876543210">
+    <label>Address or notes (optional)</label><input type="text" id="supplierNotes" placeholder="e.g. Delhi warehouse">
+    <div class="modal-actions"><button class="ghost-btn" onclick="closeModal('supplierModal')">Cancel</button><button class="primary-btn" style="margin-top:0;" onclick="submitSupplier()">Save supplier</button></div><p id="supplierError" class="error-text"></p>
+  </div>
+</div>
+<div id="barcodeScannerModal" class="modal-overlay" style="display:none;">
+  <div class="modal"><h2>Scan barcode</h2><p id="scannerStatus" class="scan-hint">Starting camera...</p><video id="barcodeVideo" class="scanner-video" autoplay muted playsinline></video>
+    <label>Or type barcode manually</label><input type="text" id="manualBarcodeValue" inputmode="numeric" placeholder="Enter barcode number">
+    <div class="modal-actions"><button class="ghost-btn" onclick="stopBarcodeScanner()">Cancel</button><button class="primary-btn" style="margin-top:0;" onclick="useManualBarcode()">Use barcode</button></div>
+  </div>
+</div>
+<div id="addUserModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('addUserModal')">
+  <div class="modal">
+    <h2>Add person</h2>
+    <label>Name</label>
+    <input type="text" id="newMemberName" placeholder="e.g. Ramesh">
+    <label>Username</label>
+    <input type="text" id="newMemberUsername" placeholder="e.g. ramesh1">
+    <label>Recovery email</label>
+    <input type="email" id="newMemberEmail" autocomplete="email" placeholder="for their own password reset">
+    <label>Password (at least 6 characters — a 6-digit number works fine)</label>
+    <input type="text" id="newMemberPassword" placeholder="e.g. 583920">
+    <label>Role</label>
+    <select id="newMemberRole">
+      <option value="viewer">Viewer — can only see stock</option>
+      <option value="admin">Admin — can add and edit everything</option>
+    </select>
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitNewMember()">Save</button>
+    </div>
+    <p id="addMemberError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="changePinModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('changePinModal')">
+  <div class="modal">
+    <h2>My account</h2>
+    <label>Recovery email (used for "forgot password")</label>
+    <input type="email" id="myRecoveryEmail" autocomplete="email">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('changePinModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="saveRecoveryEmail()">Save email</button>
+    </div>
+    <p id="recoveryEmailStatus" class="error-text"></p>
+    <hr style="border:none; border-top:1px solid var(--steel); margin:18px 0;">
+    <label>New password (at least 6 characters)</label>
+    <input type="text" id="newPasswordValue" placeholder="e.g. 583920">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('changePinModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitChangePassword()">Save password</button>
+    </div>
+    <p id="changePinError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="forgotPasswordModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('forgotPasswordModal')">
+  <div class="modal">
+    <h2>Reset your password</h2>
+    <p class="subtitle">Enter your username, or enter your account email if your old username login needs repair.</p>
+    <label>Username or email</label>
+    <input type="text" id="forgotUsername" autocomplete="username email" autocapitalize="none">
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('forgotPasswordModal')">Cancel</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="submitForgotPassword()">Send reset email</button>
+    </div>
+    <p id="forgotPasswordStatus" class="error-text"></p>
+  </div>
+</div>
+
+<div id="resetPasswordModal" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <h2>Set a new password</h2>
+    <p class="subtitle" id="resetPasswordEmailLine"></p>
+    <label>New password (at least 6 characters)</label>
+    <input type="text" id="resetPasswordValue" placeholder="e.g. 583920">
+    <div class="modal-actions">
+      <button class="primary-btn" style="margin-top:0;" onclick="submitConfirmReset()">Save new password</button>
+    </div>
+    <p id="resetPasswordError" class="error-text"></p>
+  </div>
+</div>
+
+<div id="appDialogModal" class="modal-overlay" style="display:none;">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle">
+    <h2 id="appDialogTitle">Please confirm</h2>
+    <p id="appDialogMessage" class="app-dialog-message"></p>
+    <div class="modal-actions">
+      <button id="appDialogCancel" class="ghost-btn" onclick="closeAppDialog()">Cancel</button>
+      <button id="appDialogConfirm" class="primary-btn" style="margin-top:0;" onclick="confirmAppDialog()">Confirm</button>
+    </div>
+  </div>
+</div>
+<div id="appToast" class="app-toast" role="status" aria-live="polite"></div>
+
+
+<div id="aboutModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('aboutModal')">
+  <div class="modal">
+    <h2>About StockTrack</h2>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:14px; line-height:1.6;">A stock register for shops and small factories — tracks what comes in, what goes out, and what's left, automatically. Works offline, installs like an app, and keeps every shop's data completely separate and private.</p>
+    <p style="font-size:13px; color:var(--ink-soft); line-height:1.6;">Multi-shop accounts, admin/viewer roles, low-stock alerts, item photos, and weekly usage reports by email.</p>
+    <div class="modal-actions">
+      <button class="primary-btn" style="margin-top:0;" onclick="closeModal('aboutModal')">Close</button>
+    </div>
+    <p style="font-size:11px; color:var(--ink-soft); text-align:center; margin-top:18px; font-family:var(--font-mono);">Developed by Ayush Upadhyay</p>
+  </div>
+</div>
+
+<div id="clearHistoryModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal('clearHistoryModal')">
+  <div class="modal">
+    <h2>Clear old history</h2>
+    <p style="font-size:12px; color:var(--ink-soft); margin-top:10px; line-height:1.5;">Removes transaction history older than the number of days you choose. Current stock totals stay accurate — only the detailed log is cleared. This cannot be undone.</p>
+    <label>Remove history older than (days)</label>
+    <input type="number" id="clearHistoryDays" min="1" step="1" placeholder="e.g. 30">
+    <div style="display:flex; gap:6px; margin-top:8px;">
+      <button type="button" class="ghost-btn" style="flex:1; font-size:11px; padding:8px;" onclick="setClearDays(1)">1 day</button>
+      <button type="button" class="ghost-btn" style="flex:1; font-size:11px; padding:8px;" onclick="setClearDays(7)">7 days</button>
+      <button type="button" class="ghost-btn" style="flex:1; font-size:11px; padding:8px;" onclick="setClearDays(30)">30 days</button>
+      <button type="button" class="ghost-btn" style="flex:1; font-size:11px; padding:8px;" onclick="setClearDays(90)">90 days</button>
+    </div>
+    <button type="button" class="primary-btn" onclick="previewClearHistory()">Preview</button>
+    <p id="clearHistoryStatus" class="error-text"></p>
+    <button type="button" class="secondary-btn" id="confirmClearHistoryBtn" style="display:none; width:100%; margin-top:8px; padding:11px 18px;" onclick="confirmClearHistory()">Confirm &amp; delete</button>
+    <div class="modal-actions">
+      <button class="ghost-btn" onclick="closeModal('clearHistoryModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script src="app.js"></script>
+</body>
+</html>
